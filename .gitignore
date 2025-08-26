@@ -29,3 +29,5 @@ coverage/
 
 secret_keys/
 service-account.json
+
+pubspec.lock
