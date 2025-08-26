@@ -1,8 +1,8 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:dotenv/dotenv.dart';
+import 'package:mojadwel_agent/core/providers/gemini.dart';
 
 Future<Response> onRequest(RequestContext context) async {
-  final env = context.read<DotEnv>();
-  print(env['KEY']);
-  return Response.json(body: {'message': "Hello World"});
+  final gemini = context.read<Gemini>();
+  final response = await gemini.generateText('Hello, how are you?');
+  return Response.json(body: {'message': response});
 }
