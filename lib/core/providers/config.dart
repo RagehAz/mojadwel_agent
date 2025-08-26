@@ -6,9 +6,12 @@ Middleware configProvider() {
   return provider<Config>((context) => Config(env));
 }
 
+///TODO: Add validation for the config
 class Config {
   Config(this._env);
   final DotEnv _env;
 
   String? get geminiApiKey => _env['GEMINI_API_KEY'];
+  String? get googleClientId => _env['GOOGLE_OAUTH_CLIENT_ID'];
+  String? get googleClientSecret => _env['GOOGLE_OAUTH_CLIENT_SECRET'];
 }
