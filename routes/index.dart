@@ -4,7 +4,7 @@ import 'package:mojadwel_agent/core/services/ai_service.dart';
 import 'package:mojadwel_agent/core/utilities/helpers.dart';
 import 'package:mojadwel_agent/core/utilities/web_interface_html.dart';
 
-final gemini = GeminiService('secret_keys/mojadwelagent-firebase-adminsdk-fbsvc-1842af225f.json');
+final gemini = GeminiService('x_service-account.json');
 
 Future<Response> onRequest(RequestContext context) async {
   // Initialize Gemini once (hot reload will keep it)

@@ -9,8 +9,8 @@ environment:
 dependencies:
   collection: ^1.19.1
   dart_frog: ^1.1.0
-  firebase_ai: ^3.1.0
-  googleapis: ^14.0.0
+  firebase_admin: ^0.3.0+2
+  googleapis: ^13.2.0
   googleapis_auth: ^2.0.0
   http: ^1.5.0
   meta: ^1.16.0

@@ -28,3 +28,4 @@ coverage/
 *.iml
 
 secret_keys/
+x_service-account.json
