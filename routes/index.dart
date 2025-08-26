@@ -4,7 +4,7 @@ import 'package:mojadwel_agent/core/services/ai_service.dart';
 import 'package:mojadwel_agent/core/utilities/helpers.dart';
 import 'package:mojadwel_agent/core/utilities/web_interface_html.dart';
 
-final gemini = GeminiService('x_service-account.json');
+final gemini = GeminiService();
 
 Future<Response> onRequest(RequestContext context) async {
   // Initialize Gemini once (hot reload will keep it)

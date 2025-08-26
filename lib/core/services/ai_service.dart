@@ -6,8 +6,9 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:mojadwel_agent/core/utilities/helpers.dart';
 
 class GeminiService {
-  GeminiService(String serviceAccountPath) {
-    final jsonStr = File(serviceAccountPath).readAsStringSync();
+
+  GeminiService() {
+    final jsonStr = File('service-account.json').readAsStringSync();
     _credentials = ServiceAccountCredentials.fromJson(jsonStr);
   }
 
@@ -20,7 +21,7 @@ class GeminiService {
 
         
     // applicationDefault() will look for credentials in the following locations:
-    // * the x_service-account.json file in the package main directory
+    // * the service-account.json file in the package main directory
     // * the env variable GOOGLE_APPLICATION_CREDENTIALS
     // * a configuration file, specific for this library, stored in the user's home directory
     // * gcloud's application default credentials
@@ -50,7 +51,7 @@ class GeminiService {
     blog('app: $app',);
 
     // var app = FirebaseAdmin.instance.initializeApp(AppOptions(
-    //   credential: ServiceAccountCredential('x_service-account.json'),
+    //   credential: ServiceAccountCredential('service-account.json'),
     //   projectId: 'mojadwelagent',
     //   storageBucket: 'mojadwelagent.firebasestorage.app',
     // ));
