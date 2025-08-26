@@ -1,173 +1,236 @@
-part of mojo_brain;
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+import 'package:mojadwel_agent/core/utilities/idifier.dart';
+import 'package:mojadwel_agent/core/utilities/timers.dart';
 
 @immutable
-class MojoResponseModel {
+class DMModel {
   // -----------------------------------------------------------------------------
-  const MojoResponseModel({
+  const DMModel({
     required this.id,
     required this.text,
-    this.choices = const [],
-    this.function,
-    this.data,
+    required this.time,
+    required this.ownerID,
   });
-  // -----------------------------------------------------------------------------
+  // --------------------
   final String id;
-  final String text;
-  final List<String> choices;
-  final String? function;
-  final Map<String, dynamic>? data;
+  final String? text;
+  final DateTime? time;
+  final String? ownerID;
   // -----------------------------------------------------------------------------
 
   /// CLONING
 
   // --------------------
   /// TESTED : WORKS PERFECT
-  MojoResponseModel copyWith({
+  DMModel copyWith({
     String? id,
     String? text,
-    List<String>? choices,
-    String? function,
-    Map<String, dynamic>? data,
-  }) {
-    return MojoResponseModel(
+    DateTime? time,
+    String? ownerID,
+  }){
+    return DMModel(
       id: id ?? this.id,
       text: text ?? this.text,
-      choices: choices ?? this.choices,
-      function: function ?? this.function,
-      data: data ?? this.data,
+      time: time ?? this.time,
+      ownerID: ownerID ?? this.ownerID,
     );
   }
   // --------------------
-  /// TESTED : WORKS PERFECT
-  MojoResponseModel nullifyField({
+  /*
+  ///
+  AnswerModel nullifyField({
     bool id = false,
     bool text = false,
-    bool choices = false,
-    bool function = false,
-    bool data = false,
-  }) {
-    return MojoResponseModel(
-      id: id ? '' : this.id,
-      text: text ? '' : this.text,
-      choices: choices ? [] : this.choices,
-      function: function ? null : this.function,
-      data: data ? null : this.data,
+    bool time = false,
+  }){
+    return AnswerModel(
+      id: id == true ? '' : this.id,
     );
   }
+   */
   // -----------------------------------------------------------------------------
 
   /// CYPHERS
 
   // --------------------
   /// TESTED : WORKS PERFECT
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({
+    required bool toJSON,
+  }){
     return {
-      'id': id,
       'text': text,
-      'choices': choices,
-      'function': function,
-      'data': data,
+      'id': id,
+      'time': Timers.cipherTime(time: time, toJSON: toJSON),
+      'ownerID': ownerID,
     };
   }
   // --------------------
   /// TESTED : WORKS PERFECT
   static List<Map<String, dynamic>> cipherToMaps({
-    required List<MojoResponseModel>? models,
-  }) {
+    required List<DMModel>? models,
+    required bool toJSON,
+  }){
     final List<Map<String, dynamic>> _output = [];
 
-    if (checkCanLoop(models) == true) {
-      for (final MojoResponseModel model in models!) {
-        _output.add(model.toMap());
+    if (checkCanLoop(models) == true){
+
+      for (final DMModel model in models!){
+
+        final Map<String, dynamic> _map = model.toMap(
+          toJSON: toJSON,
+        );
+
+        _output.add(_map);
+
       }
+
     }
 
     return _output;
   }
   // --------------------
   /// TESTED : WORKS PERFECT
-  static MojoResponseModel? decipherMap({
+  static DMModel? decipherMap({
     required Map<String, dynamic>? map,
-  }) {
-    MojoResponseModel? _output;
+    required bool fromJSON,
+  }){
+    DMModel? _output;
 
-    if (map != null) {
-      _output = MojoResponseModel(
-        id: map['id'] as String? ?? '',
-        text: map['text'] as String? ?? '',
-        choices: _getStringsFromDynamics(map['choices']),
-        function: map['function'] as String?,
-        data: map['data'] as Map<String, dynamic>?,
+    if (map != null && map['id'] != null){
+
+      _output = DMModel(
+        id: map['id'] as String,
+        text: map['text'] as String,
+        time: Timers.decipherTime(time: map['time'], fromJSON: fromJSON),
+        ownerID: map['ownerID'] as String,
       );
+
     }
 
     return _output;
   }
   // --------------------
   /// TESTED : WORKS PERFECT
-  static List<MojoResponseModel> decipherMaps({
+  static List<DMModel> decipherMaps({
     required List<Map<String, dynamic>>? maps,
-  }) {
-    final List<MojoResponseModel> _output = [];
+    required bool fromJSON,
+  }){
+    final List<DMModel> _output = [];
 
-    if (checkCanLoop(maps) == true) {
-      for (final Map<String, dynamic> map in maps!) {
-        final MojoResponseModel? _model = decipherMap(map: map);
-        if (_model != null) {
+    if (checkCanLoop(maps) == true){
+
+      for (final Map<String, dynamic> map in maps!){
+
+        final DMModel? _model = decipherMap(
+          map: map,
+          fromJSON: fromJSON,
+        );
+
+        if (_model != null){
           _output.add(_model);
         }
+
       }
+
+    }
+
+    return _output;
+  }
+  // -----------------------------------------------------------------------------
+
+  /// TO CHAT LOG MAP
+
+  // --------------------
+  /// TESTED : WORKS PERFECT
+  static Map<String, dynamic>? cipherToChatLogMap({
+    required List<DMModel>? models,
+    required String? userName,
+    required bool toJSON,
+  }){
+    Map<String, dynamic>? _output;
+
+    final String? _userName = Idifier.idifyString(userName);
+
+    if (_userName != null && checkCanLoop(models) == true){
+
+      _output = {};
+
+      loopSync(
+        models: models,
+        onLoop: (int index, DMModel? model){
+
+          if (model != null){
+
+            final Map<String, dynamic> _map = model.toMap(
+              toJSON: toJSON,
+            );
+
+            final String name = model.ownerID == 'cleo' ? 'cleo' : _userName;
+
+            final String _mapKey = '${index}_$name';
+
+            _output![_mapKey] = _map;
+
+          }
+
+        },
+      );
+
     }
 
     return _output;
   }
   // --------------------------------------------------------------------------
 
-  /// GENERATE RESPONSE
+  /// CREATORS
 
   // --------------------
-  ///
-  static MojoResponseModel? decipherContentResponse({
-    required GenerateContentResponse? response,
+  /// TESTED : WORKS PERFECT
+  static List<DMModel> insertNewDM({
+    required List<DMModel> dms,
+    required String? userID,
+    required String? text,
   }){
-    MojoResponseModel? _output;
 
-    if (response != null){
+    if (userID == null || text == null){
+      return dms;
+    }
 
-      dynamic _decoded;
+    else {
 
-      if (response.text != null){
-        tryAndCatch(
-          invoker: 'decipherContentResponse',
-          functions: () async {
-            _decoded = jsonDecode(response.text!);
-            },
-          onError: (String? error){
-            // Errorize.throwMap(
-            //   invoker: 'decipherContentResponse',
-            //   map: {
-            //     'theError': error,
-            //     'responseText': response.text,
-            //     'totalTokenCount': response.usageMetadata?.totalTokenCount,
-            //   },
-            // );
-          },
-        );
-      }
+      final DMModel _newDM = DMModel(
+        id: Idifier.createUniqueIDString(),
+        time: DateTime.now(),
+        ownerID: userID,
+        text: text,
+      );
 
-      if (_decoded != null){
-
-        final Map<String, dynamic>? _map = _getMapFromIHLMOO(
-          ihlmoo: _decoded,
-        );
-
-        _output = decipherMap(map: _map);
-
-      }
+      return [...dms, _newDM];
 
     }
 
-    return _output;
+  }
+  // -----------------------------------------------------------------------------
+
+  /// EQUALITY
+
+  // --------------------
+  /// TESTED : WORKS PERFECT
+  static List<DMModel> sortConversation({
+    required List<DMModel> dms,
+  }){
+
+    final List<DMModel> sorted = [...dms]; // avoid mutating original list
+
+    // ignore: cascade_invocations
+    sorted.sort((a, b) {
+      final aTime = a.time ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bTime = b.time ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return aTime.compareTo(bTime); // newest first
+    });
+
+    return sorted;
   }
   // -----------------------------------------------------------------------------
 
@@ -176,146 +239,18 @@ class MojoResponseModel {
   // --------------------
   /// TESTED : WORKS PERFECT
   static bool checkModelsAreIdentical({
-    required MojoResponseModel? model1,
-    required MojoResponseModel? model2,
-  }) {
-    return _checkMapsAreIdentical(
-      map1: model1?.toMap(),
-      map2: model2?.toMap(),
-    );
-  }
-  // --------------------
-  /// TESTED : WORKS PERFECT
-  static bool checkModelsListsAreIdentical({
-    required List<MojoResponseModel>? models1,
-    required List<MojoResponseModel>? models2,
-  }) {
-    return _checkMapsListsAreIdentical(
-      maps1: cipherToMaps(models: models1),
-      maps2: cipherToMaps(models: models2),
-    );
-  }
-  // --------------------
-  /// AI TESTED
-  static List<String> _getStringsFromDynamics(dynamic dynamics) {
-    return _getStringsFromTheDamnThing(dynamics);
-  }
-  // --------------------
-  /// AI TESTED
-  static List<String> _getStringsFromTheDamnThing(dynamic thing){
-    List<String> _output = [];
-
-    if (thing != null){
-
-      if (thing.runtimeType.toString() == 'List<String>'){
-        _output = thing as List<String>;
-      }
-
-      /// ImmutableList<Object?>
-      else if (thing.runtimeType.toString() == 'ImmutableList<Object?>'){
-        _output =  _getStringsFromDynamicsList(thing as List<Object?>);
-      }
-
-      /// _Map<String, dynamic>
-      else if (thing.runtimeType.toString() == '_Map<String, dynamic>'){
-        final Map<String, dynamic> _map = thing as Map<String, dynamic>;
-        final List<String> _keys = _map.keys.toList();
-        for (final String key in _keys){
-          if (_map[key] is String){
-            _output.add(_map[key] as String);
-          }
-        }
-      }
-
-      /// List<dynamic>
-      else if (
-      thing.runtimeType.toString() == 'List<dynamic>' ||
-          thing.runtimeType.toString() == 'List<Object?>' ||
-          thing.runtimeType.toString() == 'List<Object>' ||
-          thing.runtimeType.toString() == 'List<dynamic>?' ||
-          thing.runtimeType.toString() == 'List<Object?>?' ||
-          thing.runtimeType.toString() == 'List<Object>?'  ||
-          thing.runtimeType.toString() == 'List<dynamic>?'
-      ){
-        final List<dynamic> things = thing as List<dynamic>? ?? [];
-        _output = _getStringsFromDynamicsList(things);
-      }
-
-      /// minified
-      // else if (ObjectCheck.objectIsMinified(thing) == true){
-      //   final List<dynamic> things = thing;
-      //   for (final dynamic item in things) {
-      //     if (item is String) {
-      //       _output.add(item);
-      //     }
-      //   }
-      // }
-
-      else if (thing is List){
-        _output = _getStringsFromDynamicsList(thing);
-      }
-
-      // else if (thing is bool){
-      //   _output = ['$thing'];
-      // }
-
-      else {
-        blog('getStringsFromTheDamnThing_something_is_wrong : thing($thing)}');
-        blog('getStringsFromTheDamnThing_something_is_wrong : type(${thing.runtimeType})');
-        // assert(thing == null, 'getStringsFromTheDamnThing_something_is_wrong : ');
-      }
-
-    }
-
-    return _output;
-  }
-  // --------------------
-  /// AI TESTED
-  static List<String> _getStringsFromDynamicsList(List<dynamic>? dynamics) {
-    final List<String> _strings = [];
-
-    if (checkCanLoop(dynamics) == true) {
-      for (final dynamic thing in dynamics!) {
-
-        if (thing is String == true) {
-          _strings.add(thing as String);
-        }
-
-        else if (thing is List){
-          final List<String> _sub = _getStringsFromDynamicsList(thing);
-          _strings.addAll(_sub);
-        }
-
-        else {
-          _strings.add(thing.toString());
-        }
-
-      }
-    }
-
-    return _strings;
-  }
-  // -----------------------------------------------------------------------------
-
-  // --------------------
-  /// MANUALLY TESTED : WORKS PERFECT
-  static Map<String, dynamic>? _getMapFromIHLMOO({
-    required dynamic ihlmoo,
+    required DMModel? model1,
+    required DMModel? model2,
   }){
-    Map<String, dynamic>? _output;
 
-    /// NOTE : IHLMOO = Internal Hash Linked Map Object Object
-
-    if (ihlmoo != null){
-      _output = jsonDecode(jsonEncode(ihlmoo)) as Map<String, dynamic>?;
-      // _output = Map<String, dynamic>.from(internalHashLinkedMapObjectObject);
-    }
-
-    return _output;
+    return checkMapsAreIdentical(
+      map1: model1?.toMap(toJSON: true),
+      map2: model2?.toMap(toJSON: true),
+    );
   }
   // --------------------
   /// AI TESTED
-  static bool _checkMapsAreIdentical({
+  static bool checkMapsAreIdentical({
     required Map<String, dynamic>? map1,
     required Map<String, dynamic>? map2,
   }) {
@@ -444,8 +379,19 @@ class MojoResponseModel {
      */
   }
   // --------------------
+  /// TESTED : WORKS PERFECT
+  static bool checkModelsListsAreIdentical({
+    required List<DMModel>? models1,
+    required List<DMModel>? models2,
+  }){
+    return checkMapsListsAreIdentical(
+      maps1: cipherToMaps(models: models1, toJSON: true),
+      maps2: cipherToMaps(models: models2, toJSON: true),
+    );
+  }
+  // --------------------
   /// AI TESTED
-  static bool _checkMapsListsAreIdentical({
+  static bool checkMapsListsAreIdentical({
     required List<Map<String, dynamic>>? maps1,
     required List<Map<String, dynamic>>? maps2,
   }){
@@ -524,7 +470,7 @@ class MojoResponseModel {
       else {
         for (int i = 0; i < maps1.length; i++) {
 
-          if (_checkMapsAreIdentical(map1: maps1[i], map2: maps2[i]) == false){
+          if (checkMapsAreIdentical(map1: maps1[i], map2: maps2[i]) == false){
             // blog('items at index ( $i ) do not match : ( ${list1[i]} ) <=> ( ${list2[i]} )');
 
             if (maps1[i].toString() == maps2[i].toString()){
@@ -553,29 +499,64 @@ class MojoResponseModel {
   }
   // -----------------------------------------------------------------------------
 
+  /// HELPERS
+
+  // --------------------
+  static bool checkCanLoop(List<dynamic>? list) {
+    bool _canLoop = false;
+
+    if (list != null && list.isNotEmpty) {
+      _canLoop = true;
+    }
+
+    return _canLoop;
+  }
+  // --------------------
+  /// TESTED : WORKS PERFECT
+  static void loopSync<T>({
+    required List<T?>? models,
+    required void Function(int index, T? model) onLoop,
+    Function? onListIsEmpty,
+  }) {
+
+    if (checkCanLoop(models) == true){
+
+      for (int i = 0; i < models!.length; i++){
+        onLoop(i, models[i]);
+      }
+
+    }
+
+    else {
+      onListIsEmpty?.call();
+    }
+
+  }
+  // -----------------------------------------------------------------------------
+
   /// OVERRIDES
 
   // --------------------
-  /// TESTED : WORKS PERFECT
   @override
-  String toString() => '''
-CleoResponseModel(
-  id: $id,
-  text: $text,
-  choices: $choices,
-  function: $function,
-  data: $data,
-)
+  String toString() =>
+      '''
+DMModel(
+   id : $id,
+   text: $text,
+   time: $time,
+   ownerID: $ownerID,
+)  
 ''';
   // --------------------
   @override
-  bool operator ==(Object other) {
+  bool operator == (Object other){
+
     if (identical(this, other)) {
       return true;
     }
 
     bool _areIdentical = false;
-    if (other is MojoResponseModel) {
+    if (other is DMModel){
       _areIdentical = checkModelsAreIdentical(
         model1: this,
         model2: other,
@@ -585,8 +566,11 @@ CleoResponseModel(
     return _areIdentical;
   }
   // --------------------
-  ///
   @override
-  int get hashCode => Object.hash(id, text, choices, function, data);
-  // --------------------------------------------------------------------------
+  int get hashCode =>
+      text.hashCode^
+      time.hashCode^
+      ownerID.hashCode^
+      id.hashCode;
+// -----------------------------------------------------------------------------
 }

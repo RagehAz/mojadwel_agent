@@ -2,4 +2,9 @@ include: package:dart_frog_lint/recommended.yaml
 analyzer:
   errors:
     lines_longer_than_80_chars: ignore
+    no_leading_underscores_for_local_identifiers: ignore
+    no_literal_bool_comparisons: ignore
+    omit_local_variable_types: ignore
+    public_member_api_docs: ignore
+    unnecessary_raw_strings: ignore
     use_string_in_part_of_directives: ignore

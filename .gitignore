@@ -26,3 +26,5 @@ coverage/
 # IDE
 .idea/
 *.iml
+
+secret_keys/

@@ -7,7 +7,13 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  collection: ^1.19.1
   dart_frog: ^1.1.0
+  firebase_ai: ^3.1.0
+  googleapis: ^14.0.0
+  googleapis_auth: ^2.0.0
+  http: ^1.5.0
+  meta: ^1.16.0
 
 dev_dependencies:
   dart_frog_lint: ^0.1.0
