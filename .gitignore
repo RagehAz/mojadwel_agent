@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dart / Pub
+.dart_tool/
+.packages
+
+# Lockfile (keep it tracked for apps, comment out if package)
+# pubspec.lock
+
+# Dart Frog build
+build/
+.dart_frog
+
+# Tests
+coverage/
+
+# Logs
+*.log
+
+# Secrets
+.env
+
+# IDE
+.idea/
+*.iml
